@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team 2 | Automated Student Feedback System</title>
+    <style>
+        /* CSS VARIABLES FOR THEME CONSISTENCY */
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: skyblue;
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+        }
+
+        /* SIDEBAR NAVIGATION */
+        nav {
+            width: 280px;
+            background: #1e293b;
+            color: white;
+            height: 100vh;
+            padding: 2rem;
+            position: fixed;
+        }
+
+        nav h1 { font-size: 1.2rem; margin-bottom: 2rem; color: #38bdf8; }
+        nav ul { list-style: none; }
+        nav li { margin-bottom: 1rem; font-size: 0.9rem; opacity: 0.8; }
+
+        /* MAIN CONTENT AREA */
+        main {
+            margin-left: 280px;
+            padding: 3rem;
+            width: 100%;
+        }
+
+        .container {
+            max-width: 800px;
+            background-image: url(baby.jpeg);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .header-section { margin-bottom: 2rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem; }
+
+        /* FORM STYLING */
+        .form-group { margin-bottom: 1.5rem; }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        input[type="text"], 
+        input[type="email"],
+        select, 
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* RATING RADIO BUTTONS */
+        .rating-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .rating-item {
+            flex: 1;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* SUBMIT BUTTON */
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover { background-color: #1d4ed8; }
+
+        /* TASK 5 & 6: ANALYSIS CONSOLE */
+        #analysis-console {
+            margin-top: 2rem;
+            background: #0f172a;
+            color: #4ade80;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1>Team 2 Project</h1>
+        <ul>
+            <li>CO1: Form Application</li>
+            <li>CO2: HTTP Communication</li>
+            <li>Task: GET/POST Methods</li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="header-section">
+                <h2>Student Course Feedback</h2>
+                <p>Please provide your honest feedback for the current semester.</p>
+            </div>
+
+            <form action="server_mock.html" method="GET" id="feedbackForm">
+                
+                <div class="form-group">
+                    <label for="student_name">Full Name</label>
+                    <input type="text" id="student_name" name="student_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="course">Select Course</label>
+                    <select id="course" name="course">
+                        <option value="web_tech">Web Technologies</option>
+                        <option value="dbms">Database Management</option>
+                        <option value="os">Operating Systems</option>
+			<option value="faculty">Faculty</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Overall Satisfaction</label>
+                    <div class="rating-container">
+                        <label><input type="radio" name="rating" value="5" checked> Excellent</label>
+                        <label><input type="radio" name="rating" value="3"> Average</label>
+                        <label><input type="radio" name="rating" value="1"> Poor</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="comments">Suggestions for Improvement (Textarea)</label>
+                    <textarea id="comments" name="comments" rows="5" placeholder="Enter your comments here..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit via HTTP GET</button>
+            </form>
+
+            <div id="analysis-console">
+                <p>> Analyzing HTTP Request...</p>
+                <div id="url-output"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Task 5: Analyzing Request Parameters
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Stay on page to show analysis
+            
+            const formData = new FormData(this);
+            const params = new URLSearchParams(formData).toString();
+            
+            const consoleBox = document.getElementById('analysis-console');
+            const output = document.getElementById('url-output');
+            
+            consoleBox.style.display = 'block';
+            output.innerHTML = `
+                <br><strong>Request Method:</strong> GET
+                <br><strong>Query String:</strong> ?${params}
+                <br><br><strong>Parameter Breakdown:</strong><br>
+                ${params.split('&').map(p => `- ${p.replace('=', ': ')}`).join('<br>')}
+            `;
+        });
+    </script>
+</body>
+</html>
